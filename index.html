@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>كريستون للاستشارات المالية</title>
-<link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/19QTkwl17y_LlAt5e-hEKHpmThGBfvIx9">
+<title>FinProject Pro v5</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════
@@ -249,14 +248,9 @@ textarea.fi{resize:vertical;min-height:70px}
 <!-- SIDEBAR -->
 <nav class="sb">
   <div class="sb-logo">
-    <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 80px; background: transparent; padding: 0; box-sizing: border-box;">
-  
-  <div class="ico" style="display: flex; justify-content: center; align-items: center;">
-    <img src="https://lh3.googleusercontent.com/d/19QTkwl17y_LlAt5e-hEKHpmThGBfvIx9" alt="Kreston Icon" style="max-height: 45px; width: auto; display: block; object-fit: contain;">
+    <div class="ico">ف</div>
+    <div><h1>FinProject Pro</h1><p>مجلس أثر الشباب 2026</p></div>
   </div>
-
-</div>
-    </div>
   <div class="sb-sec">
     <div class="sb-lbl">الرئيسية</div>
     <div class="nav on" onclick="pg('dash',this)">
@@ -482,7 +476,7 @@ textarea.fi{resize:vertical;min-height:70px}
       <div class="fg"><label class="fl">رابط الـ API</label><input class="fi" id="apiUrlInp" placeholder="https://script.google.com/macros/s/..."></div>
       <button class="btn btn-primary" onclick="saveApiUrl()">💾 حفظ الرابط</button>
       <div style="margin-top:10px;font-size:11px;color:var(--text2)">الحالي: <span id="curApiUrl" style="color:var(--blue);font-size:10px;word-break:break-all"></span></div>
-      <div style="margin-top:10px">
+      <div style="margin-top:10px" class="adm-act">
         <button class="btn btn-sm" onclick="pushInitialData()">📤 رفع البيانات الافتراضية للـ Sheet</button>
         <div style="font-size:10px;color:var(--text2);margin-top:4px">استخدم هذا الزر مرة واحدة فقط عند إعداد النظام لأول مرة</div>
       </div>
@@ -751,17 +745,22 @@ function applySheet(data){
     }));
   }
   if(data['TASKS'] && data['TASKS'].length>1){
-    ORG_TASKS={};
+    const newTasks={};
     data['TASKS'].slice(1).forEach(r=>{
+      if(!r[0] && !r[1]) return;
       const oid=+r[0], tid=String(r[1]);
-      if(!ORG_TASKS[oid]) ORG_TASKS[oid]={};
-      ORG_TASKS[oid][tid]={pct:+r[2]||0,note:r[3]||'',start:r[4]||'',end:r[5]||'',assignee:r[6]||''};
+      if(!newTasks[oid]) newTasks[oid]={};
+      newTasks[oid][tid]={pct:+r[2]||0,note:r[3]||'',start:r[4]||'',end:r[5]||'',assignee:r[6]||''};
     });
-    // Fill missing tasks
-    ORGS.forEach(o=>{
-      if(!ORG_TASKS[o.id]) ORG_TASKS[o.id]={};
-      MASTER_TASKS.forEach(t=>{ if(!ORG_TASKS[o.id][t.id]) ORG_TASKS[o.id][t.id]={pct:0,note:'',start:'',end:'',assignee:''}; });
-    });
+    // Only apply if we got real data (more than just headers)
+    if(Object.keys(newTasks).length>0){
+      ORG_TASKS=newTasks;
+      // Fill missing tasks for all orgs
+      ORGS.forEach(o=>{
+        if(!ORG_TASKS[o.id]) ORG_TASKS[o.id]={};
+        MASTER_TASKS.forEach(t=>{ if(!ORG_TASKS[o.id][t.id]) ORG_TASKS[o.id][t.id]={pct:0,note:'',start:'',end:'',assignee:''}; });
+      });
+    }
   }
   if(data['USERS'] && data['USERS'].length>1){
     USERS={};
@@ -802,37 +801,66 @@ function logAct(action, details){
 }
 
 /* ── LOGIN / LOGOUT ── */
+function applyLogin(u){
+  CU=u;
+  el('lErr').style.display='none';
+  el('lWrap').style.display='none';
+  el('aWrap').style.display='flex';
+  const av=el('sbAva');
+  av.className='ava '+(USERS[u].cls||'av-x');
+  av.textContent=USERS[u].ava||USERS[u].name[0];
+  el('sbName').textContent=USERS[u].name;
+  el('sbRole').textContent=USERS[u].role;
+  if(!isAdmin()){
+    document.querySelectorAll('.adm-nav,.adm-act').forEach(e=>e.style.display='none');
+  }
+  el('apiUrlInp').value=API_URL;
+  el('curApiUrl').textContent=API_URL;
+  initSelects();
+  syncNow();
+}
 function doLogin(){
   const u=el('uIn').value.trim(), p=el('pIn').value;
   if(USERS[u] && USERS[u].pw===p){
-    CU=u;
-    el('lErr').style.display='none';
-    el('lWrap').style.display='none';
-    el('aWrap').style.display='flex';
-    const av=el('sbAva');
-    av.className='ava '+(USERS[u].cls||'av-x');
-    av.textContent=USERS[u].ava||USERS[u].name[0];
-    el('sbName').textContent=USERS[u].name;
-    el('sbRole').textContent=USERS[u].role;
-    if(!isAdmin()){
-      document.querySelectorAll('.adm-nav,.adm-act').forEach(e=>e.style.display='none');
-    }
-    el('apiUrlInp').value=API_URL;
-    el('curApiUrl').textContent=API_URL;
-    initSelects();
-    syncNow();
+    localStorage.setItem('fp_session', JSON.stringify({u, p}));
+    applyLogin(u);
   } else {
     el('lErr').style.display='block';
     el('pIn').value='';
   }
 }
 function doLogout(){
-  CU=null; el('lWrap').style.display='flex'; el('aWrap').style.display='none';
+  CU=null;
+  localStorage.removeItem('fp_session');
+  el('lWrap').style.display='flex'; el('aWrap').style.display='none';
   el('uIn').value=''; el('pIn').value='';
   document.querySelectorAll('.adm-nav,.adm-act').forEach(e=>e.style.display='');
 }
+function tryAutoLogin(){
+  const sess = localStorage.getItem('fp_session');
+  if(!sess) return;
+  try{
+    const {u,p} = JSON.parse(sess);
+    if(USERS[u] && USERS[u].pw===p){ applyLogin(u); return true; }
+  } catch(e){}
+  localStorage.removeItem('fp_session');
+  return false;
+}
 el('pIn').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 el('uIn').addEventListener('keydown',e=>{if(e.key==='Enter')el('pIn').focus();});
+
+// Auto-login on page load
+window.addEventListener('DOMContentLoaded', ()=>{
+  // Try session restore after data loads
+  const sess = localStorage.getItem('fp_session');
+  if(sess){
+    try{
+      const {u,p} = JSON.parse(sess);
+      if(USERS[u] && USERS[u].pw===p){ applyLogin(u); }
+      else { localStorage.removeItem('fp_session'); }
+    } catch(e){ localStorage.removeItem('fp_session'); }
+  }
+});
 
 /* ── NAV ── */
 function pg(id,navEl){
