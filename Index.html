@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>كريستون للاستشارات المالية</title>
+<link rel="icon" type="image/x-icon" href="https://lh3.googleusercontent.com/d/19QTkwl17y_LlAt5e-hEKHpmThGBfvIx9">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   BASE
+══════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F0F2F5;--bg2:#fff;--bg3:#F7F8FA;--bg4:#ECEEF2;
+  --text:#111827;--text2:#6B7280;--text3:#9CA3AF;
+  --border:#E5E7EB;--border2:#D1D5DB;
+  --blue:#1B4FD8;--blue-l:#EEF2FF;--blue-t:#3B6BEA;
+  --green:#15803D;--green-l:#DCFCE7;
+  --red:#B91C1C;--red-l:#FEE2E2;
+  --amber:#B45309;--amber-l:#FEF3C7;
+  --purple:#6D28D9;--purple-l:#EDE9FE;
+  --teal:#0F766E;--teal-l:#CCFBF1;
+  --r:8px;--rl:12px;--rx:16px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 20px rgba(0,0,0,.12);
+  --sidebar:240px;
+}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh}
+
+/* ══ SYNC BAR ══ */
+#syncBar{position:fixed;top:0;left:0;right:0;z-index:9000;height:3px;background:linear-gradient(90deg,var(--blue),var(--blue-t));display:none}
+#syncBar.on{display:block;animation:syncAnim 1.4s ease-in-out infinite}
+@keyframes syncAnim{0%{transform:scaleX(0);transform-origin:right}50%{transform:scaleX(1);transform-origin:right}51%{transform:scaleX(1);transform-origin:left}100%{transform:scaleX(0);transform-origin:left}}
+
+/* ══ TOAST ══ */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(70px);background:#1f2937;color:#fff;padding:10px 22px;border-radius:50px;font-size:12px;font-weight:700;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ══ LOGIN ══ */
+.lw{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#EEF2FF 0%,#F0F9FF 50%,#ECFDF5 100%)}
+.lb{background:#fff;border:1px solid var(--border);border-radius:var(--rx);padding:36px 32px;width:380px;box-shadow:var(--sh2)}
+.lh{text-align:center;margin-bottom:28px}
+.lh .logo{width:52px;height:52px;background:linear-gradient(135deg,var(--blue),var(--blue-t));border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#fff;font-size:24px;font-weight:900}
+.lh h1{font-size:20px;font-weight:800}
+.lh p{font-size:11px;color:var(--text2);margin-top:3px}
+.fg{margin-bottom:12px}
+.fl{display:block;font-size:11px;color:var(--text2);margin-bottom:4px;font-weight:700}
+.fi{width:100%;padding:9px 12px;border:1.5px solid var(--border2);border-radius:var(--r);font-size:13px;font-family:'Cairo',sans-serif;background:#fff;color:var(--text);transition:border-color .15s;outline:none}
+.fi:focus{border-color:var(--blue)}
+textarea.fi{resize:vertical;min-height:70px}
+.lbtn{width:100%;padding:11px;background:linear-gradient(135deg,var(--blue),var(--blue-t));color:#fff;border:none;border-radius:var(--r);font-size:14px;font-family:'Cairo',sans-serif;font-weight:800;cursor:pointer;margin-top:4px;transition:opacity .15s}
+.lbtn:hover{opacity:.88}
+.lerr{font-size:11px;color:var(--red);margin-top:8px;display:none;text-align:center;background:var(--red-l);padding:6px 10px;border-radius:var(--r)}
+.lhint{margin-top:14px;padding:10px 12px;background:var(--bg3);border-radius:var(--r);font-size:10px;color:var(--text2);line-height:1.9}
+.lhint b{font-weight:800;display:block;margin-bottom:2px;color:var(--text)}
+
+/* ══ APP ══ */
+.app{display:flex;min-height:100vh}
+
+/* ══ SIDEBAR ══ */
+.sb{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-logo{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-logo .ico{width:36px;height:36px;background:linear-gradient(135deg,var(--blue),var(--blue-t));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:900;flex-shrink:0}
+.sb-logo h1{font-size:13px;font-weight:800;color:var(--text);line-height:1.2}
+.sb-logo p{font-size:9px;color:var(--text2);margin-top:2px}
+.sb-sec{padding:6px 0}
+.sb-lbl{font-size:9px;color:var(--text3);padding:7px 16px 2px;text-transform:uppercase;letter-spacing:.8px;font-weight:700}
+.nav{display:flex;align-items:center;gap:9px;padding:7px 14px;cursor:pointer;color:var(--text2);border-right:3px solid transparent;font-size:12px;font-weight:600;transition:all .12s;margin:1px 0;user-select:none}
+.nav:hover{background:var(--bg3);color:var(--text)}
+.nav.on{background:var(--blue-l);color:var(--blue);border-right-color:var(--blue)}
+.nav svg{width:15px;height:15px;flex-shrink:0}
+.sb-foot{padding:12px 14px;border-top:1px solid var(--border);margin-top:auto}
+.sb-sync{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--bg3);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:background .12s}
+.sb-sync:hover{background:var(--bg4)}
+.sd{width:7px;height:7px;border-radius:50%;background:#10B981;flex-shrink:0;transition:background .3s}
+.sd.err{background:var(--red)}
+.sd.sync{animation:sdpulse .7s infinite}
+@keyframes sdpulse{0%,100%{opacity:1}50%{opacity:.25}}
+.sb-sync .sl{font-size:10px;font-weight:600;color:var(--text2);flex:1}
+.sb-sync .st{font-size:9px;color:var(--text3)}
+.sb-user{display:flex;align-items:center;gap:8px}
+.ava{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.av-b{background:var(--blue-l);color:var(--blue)}
+.av-g{background:var(--green-l);color:var(--green)}
+.av-p{background:var(--purple-l);color:var(--purple)}
+.av-t{background:var(--teal-l);color:var(--teal)}
+.av-a{background:var(--amber-l);color:var(--amber)}
+.av-x{background:var(--bg4);color:var(--text2)}
+.sb-uname{font-size:12px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-urole{font-size:9px;color:var(--text2)}
+.out-btn{padding:4px 9px;border:1px solid var(--border2);border-radius:6px;font-size:10px;font-family:'Cairo',sans-serif;background:transparent;color:var(--text2);cursor:pointer;transition:all .12s}
+.out-btn:hover{background:var(--red-l);color:var(--red);border-color:transparent}
+
+/* ══ MAIN ══ */
+.main{flex:1;overflow-y:auto;padding:20px 24px;min-width:0}
+.pg{display:none}.pg.on{display:block}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:10px;flex-wrap:wrap}
+.ph-title{font-size:18px;font-weight:800}
+.ph-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.ph-r{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+
+/* ══ KPI ══ */
+.krow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px;box-shadow:var(--sh)}
+.kpi-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:16px}
+.kpi-v{font-size:24px;font-weight:800;line-height:1}
+.kpi-l{font-size:11px;color:var(--text2);margin-top:4px}
+
+/* ══ CARDS ══ */
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px;box-shadow:var(--sh)}
+.chd{font-size:12px;font-weight:700;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+/* ══ PILLS ══ */
+.pill{display:inline-block;font-size:10px;padding:3px 9px;border-radius:20px;font-weight:700}
+.p-s{background:var(--green-l);color:var(--green)}
+.p-w{background:var(--amber-l);color:var(--amber)}
+.p-d{background:var(--red-l);color:var(--red)}
+.p-i{background:var(--blue-l);color:var(--blue)}
+.p-p{background:var(--purple-l);color:var(--purple)}
+
+/* ══ PROGRESS ══ */
+.pbar{background:var(--bg4);border-radius:4px;overflow:hidden;flex:1}
+.pbf{height:100%;border-radius:4px;transition:width .5s ease}
+.prow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
+.prow:last-child{border-bottom:none}
+.pn{flex:1;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ppc{font-size:11px;font-weight:800;min-width:34px;text-align:left}
+
+/* ══ TABLE ══ */
+.tw{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:9px 10px;text-align:right;border-bottom:2px solid var(--border);color:var(--text2);font-weight:700;background:var(--bg3);font-size:11px;white-space:nowrap;position:sticky;top:0;z-index:1}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg3)}
+
+/* ══ BUTTONS ══ */
+.btn{padding:7px 14px;border:1.5px solid var(--border2);border-radius:var(--r);font-size:12px;font-family:'Cairo',sans-serif;font-weight:600;background:transparent;color:var(--text);cursor:pointer;transition:all .12s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.btn:hover{background:var(--bg3)}
+.btn-primary{background:var(--blue);color:#fff;border-color:transparent}
+.btn-primary:hover{background:#1544C0;opacity:1}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-edit{background:var(--amber-l);color:var(--amber);border-color:transparent}
+.btn-del{background:var(--red-l);color:var(--red);border-color:transparent}
+.btn-ok{background:var(--green-l);color:var(--green);border-color:transparent;font-weight:700}
+.btn-ghost{background:transparent;border-color:var(--border2);color:var(--text2)}
+
+/* ══ FILTER BAR ══ */
+.fbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:11px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:14px;box-shadow:var(--sh)}
+.fbar select,.fbar input[type=text],.fbar input[type=search]{padding:6px 10px;border:1.5px solid var(--border2);border-radius:var(--r);font-size:12px;font-family:'Cairo',sans-serif;color:var(--text);background:#fff;outline:none;transition:border-color .12s}
+.fbar select:focus,.fbar input:focus{border-color:var(--blue)}
+.fbar label{font-size:11px;font-weight:700;color:var(--text2);white-space:nowrap}
+
+/* ══ MODAL ══ */
+.mback{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;backdrop-filter:blur(3px)}
+.mback.open{display:flex}
+.mbox{background:var(--bg2);border-radius:var(--rx);border:1px solid var(--border);padding:24px;box-shadow:0 24px 64px rgba(0,0,0,.2);margin-bottom:40px;width:100%;max-width:520px;animation:mIn .2s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(-20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.mtitle{font-size:15px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;border-top:1px solid var(--border);padding-top:14px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ══ ASSIGNEE TAG ══ */
+.atag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--purple-l);color:var(--purple);border-radius:20px;font-size:10px;font-weight:700}
+
+/* ══ ORG CARD GRID ══ */
+.org-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.org-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:12px 14px;box-shadow:var(--sh);transition:all .15s}
+.org-card:hover{border-color:var(--blue-t);box-shadow:0 4px 16px rgba(27,79,216,.1);transform:translateY(-1px)}
+
+/* ══ GANTT ══ */
+.gantt-tbl{border-collapse:collapse;font-size:11px;width:100%}
+.gantt-tbl th{padding:7px 8px;border:1px solid var(--border);background:var(--bg3);font-weight:700;color:var(--text2);white-space:nowrap;text-align:right;font-size:10px}
+.gantt-tbl td{padding:4px 8px;border:1px solid var(--border);vertical-align:middle}
+.gbar{height:13px;border-radius:3px;display:inline-block;width:100%}
+
+/* ══ ACTIVITY ══ */
+.aitem{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.aitem:last-child{border-bottom:none}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.abody{flex:1;min-width:0}
+.atext{font-size:11px;line-height:1.5}
+.ameta{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ══ STAT MINI ══ */
+.sm{background:var(--bg3);border-radius:var(--r);padding:10px 12px}
+.sm-v{font-size:20px;font-weight:800;line-height:1}
+.sm-l{font-size:10px;color:var(--text2);margin-top:3px}
+
+/* ══ REPORT HEADER ══ */
+.rep-hdr{background:linear-gradient(135deg,#1B4FD8,#3B6BEA);color:#fff;border-radius:var(--rl);padding:22px;margin-bottom:16px}
+.rep-hdr h2{font-size:17px;font-weight:800;margin-bottom:4px}
+.rep-hdr p{font-size:11px;opacity:.85}
+
+/* ══ PRINT ══ */
+@media print{
+  body{background:#fff!important}
+  .sb,.ph-r,.fbar,.btn,.mback,#syncBar,#toast,.out-btn,.nav,
+  #pg-dash,#pg-orgs,#pg-tasks,#pg-gantt,#pg-eval,#pg-activity,
+  #pg-team,#pg-settings{display:none!important}
+  .app{display:block!important}
+  .main{padding:0!important;overflow:visible!important}
+  #pg-report{display:block!important}
+  .card{box-shadow:none!important;border:1px solid #ccc!important;page-break-inside:avoid}
+  .rep-hdr{background:var(--blue)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tbl th{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pbf{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{margin:15mm;size:A4}
+}
+
+/* ══ EMPTY ══ */
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty svg{width:40px;height:40px;margin:0 auto 10px;opacity:.3}
+.empty p{font-size:12px}
+
+@media(max-width:900px){
+  .krow{grid-template-columns:repeat(2,1fr)}
+  .org-grid{grid-template-columns:repeat(2,1fr)}
+  .sb{width:200px;min-width:200px}
+}
+</style>
+</head>
+<body>
+<div id="syncBar"></div>
+<div id="toast"></div>
+
+<!-- LOGIN -->
+<div id="lWrap" class="lw">
+<div class="lb">
+  <div class="lh">
+    <div class="logo" style="background:transparent;padding:0">
+      <img src="https://lh3.googleusercontent.com/d/19QTkwl17y_LlAt5e-hEKHpmThGBfvIx9" alt="Kreston Logo" style="max-height:50px;width:auto">
+    </div>
+    <p>منصة إدارة المشاريع — المنظمات غير الربحية</p>
+  </div>
+  <div class="fg"><label class="fl">اسم المستخدم</label><input class="fi" id="uIn" placeholder="مثال: msalem" autocomplete="username"></div>
+  <div class="fg"><label class="fl">كلمة المرور</label><input class="fi" type="password" id="pIn" placeholder="••••••••" autocomplete="current-password"></div>
+  <div class="lerr" id="lErr">⚠️ بيانات الدخول غير صحيحة</div>
+  <button class="lbtn" onclick="doLogin()">دخول إلى النظام</button>
+  <div class="lhint"><b>بيانات تجريبية</b>msalem / kreston2026 &nbsp;·&nbsp; ibrahim / athar2026<br>hashem / hashem123 &nbsp;·&nbsp; fatima / fatima123</div>
+</div>
+</div>
+
+<!-- APP -->
+<div id="aWrap" class="app" style="display:none">
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-logo">
+    <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 80px; background: transparent; padding: 0; box-sizing: border-box;">
+  
+  <div class="ico" style="display: flex; justify-content: center; align-items: center;">
+    <img src="https://lh3.googleusercontent.com/d/19QTkwl17y_LlAt5e-hEKHpmThGBfvIx9" alt="Kreston Icon" style="max-height: 45px; width: auto; display: block; object-fit: contain;">
+  </div>
+
+</div>
+    </div>
+  <div class="sb-sec">
+    <div class="sb-lbl">الرئيسية</div>
+    <div class="nav on" onclick="pg('dash',this)">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>لوحة التحكم
+    </div>
+    <div class="nav" onclick="pg('orgs',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a3 3 0 100 6 3 3 0 000-6zM2 14c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/></svg>الجمعيات
+    </div>
+    <div class="nav" onclick="pg('tasks',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5.5 8l2 2 3.5-3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>المهام والمراحل
+    </div>
+    <div class="nav" onclick="pg('gantt',this)">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="3" width="9" height="2.5" rx="1.2"/><rect x="4" y="7" width="10" height="2.5" rx="1.2" opacity=".6"/><rect x="2" y="11" width="7" height="2.5" rx="1.2" opacity=".4"/></svg>الجداول الزمنية
+    </div>
+    <div class="nav" onclick="pg('eval',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1,13 5,8 8,10 11,5 15,7"/><polyline points="11,5 15,5 15,9"/></svg>التقييم القبلي/البعدي
+    </div>
+    <div class="nav" onclick="pg('activity',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2" stroke-linecap="round"/></svg>سجل النشاط
+    </div>
+    <div class="nav" onclick="pg('report',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2h8l2 2v10H4z"/><path d="M10 2v3h3M6 8h5M6 10.5h5M6 5.5h2.5"/></svg>التقارير
+    </div>
+  </div>
+  <div class="sb-sec" id="admSec">
+    <div class="sb-lbl">إدارة</div>
+    <div class="nav adm-nav" onclick="pg('team',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="2.5"/><circle cx="11.5" cy="5.5" r="2" opacity=".6"/><path d="M1 14c0-2.5 2.2-4 5-4s5 1.5 5 4"/><path d="M10.5 11c1.5.4 2.5 1.5 2.5 3" opacity=".6"/></svg>فريق العمل
+    </div>
+    <div class="nav adm-nav" onclick="pg('settings',this)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.5"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.8 3.8l1 1M11.2 11.2l1 1M12.2 3.8l-1 1M4.8 11.2l-1 1"/></svg>الإعدادات
+    </div>
+  </div>
+  <div class="sb-foot">
+    <div class="sb-sync" onclick="syncNow()">
+      <div class="sd" id="sdot"></div>
+      <span class="sl" id="slbl">البيانات محدّثة</span>
+      <span class="st" id="stm"></span>
+    </div>
+    <div class="sb-user">
+      <div class="ava" id="sbAva"></div>
+      <div style="flex:1;min-width:0"><div class="sb-uname" id="sbName"></div><div class="sb-urole" id="sbRole"></div></div>
+      <button class="out-btn" onclick="doLogout()">خروج</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- DASH -->
+<div id="pg-dash" class="pg on">
+  <div class="ph">
+    <div><div class="ph-title">لوحة التحكم</div><div class="ph-sub">نظرة شاملة على مشروع رفع كفاءة الإدارة المالية 2026</div></div>
+    <div class="ph-r"><button class="btn btn-primary btn-sm" onclick="syncNow()">🔄 مزامنة</button></div>
+  </div>
+  <div class="krow">
+    <div class="kpi"><div class="kpi-ico" style="background:var(--blue-l)">🏢</div><div class="kpi-v" id="k1">—</div><div class="kpi-l">إجمالي الجمعيات</div></div>
+    <div class="kpi"><div class="kpi-ico" style="background:var(--green-l)">✅</div><div class="kpi-v" id="k2">—</div><div class="kpi-l">جمعيات نشطة</div></div>
+    <div class="kpi"><div class="kpi-ico" style="background:var(--amber-l)">⏸️</div><div class="kpi-v" id="k3">—</div><div class="kpi-l">جمعيات متوقفة</div></div>
+    <div class="kpi"><div class="kpi-ico" style="background:var(--purple-l)">📊</div><div class="kpi-v" id="k4">—</div><div class="kpi-l">متوسط الإنجاز</div></div>
+  </div>
+  <div class="krow">
+    <div class="kpi"><div class="kpi-ico" style="background:var(--green-l)">🎯</div><div class="kpi-v" id="k5">—</div><div class="kpi-l">مهام مكتملة</div></div>
+    <div class="kpi"><div class="kpi-ico" style="background:var(--blue-l)">⚡</div><div class="kpi-v" id="k6">—</div><div class="kpi-l">مهام جارية</div></div>
+    <div class="kpi"><div class="kpi-ico" style="background:var(--amber-l)">⏳</div><div class="kpi-v" id="k7">—</div><div class="kpi-l">مهام معلقة</div></div>
+    <div class="kpi"><div class="kpi-ico" style="background:var(--bg4)">📋</div><div class="kpi-v" id="k8">—</div><div class="kpi-l">إجمالي المهام</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="chd">تقدم الجمعيات <span style="font-size:10px;font-weight:400;color:var(--text3)">مرتبة تنازلياً</span></div><div id="dProg"></div></div>
+    <div class="card"><div class="chd">تقدم المراحل الأربع</div><div id="dPhase"></div></div>
+  </div>
+  <div class="card"><div class="chd">بطاقات الجمعيات</div><div class="org-grid" id="dGrid"></div></div>
+</div>
+
+<!-- ORGS -->
+<div id="pg-orgs" class="pg">
+  <div class="ph">
+    <div><div class="ph-title">الجمعيات</div><div class="ph-sub">إدارة بيانات الجمعيات المشاركة</div></div>
+    <div class="ph-r"><button class="btn btn-primary adm-act" onclick="openAddOrg()">+ إضافة جمعية</button></div>
+  </div>
+  <div class="fbar">
+    <label>الحالة:</label>
+    <select id="fOrgSt" onchange="renderOrgs()">
+      <option value="">جميع الحالات</option><option value="active">نشطة</option><option value="stopped">متوقفة</option>
+    </select>
+    <label>المدينة:</label>
+    <select id="fOrgCi" onchange="renderOrgs()">
+      <option value="">جميع المدن</option><option>الرياض</option><option>الشرقية</option><option>جدة</option>
+    </select>
+    <input type="text" id="fOrgQ" placeholder="🔍 بحث بالاسم..." style="flex:1;min-width:140px" oninput="renderOrgs()">
+    <button class="btn btn-sm btn-ghost" onclick="resetFilter('fOrgSt','fOrgCi','fOrgQ');renderOrgs()">مسح</button>
+  </div>
+  <div class="tw"><table class="tbl"><thead><tr>
+    <th>#</th><th>الجمعية</th><th>المدينة</th><th>البرنامج</th><th>ضابط الاتصال</th><th>الإنجاز</th><th>الحالة</th><th>التقييم</th><th>إجراء</th>
+  </tr></thead><tbody id="orgBody"></tbody></table></div>
+</div>
+
+<!-- TASKS -->
+<div id="pg-tasks" class="pg">
+  <div class="ph">
+    <div><div class="ph-title">المهام والمراحل</div><div class="ph-sub">متابعة تفصيلية لتقدم المهام</div></div>
+    <div class="ph-r" id="taskStats"></div>
+  </div>
+  <div class="fbar">
+    <label>الجمعية:</label>
+    <select id="fTOrg" onchange="renderTasks()"><option value="">جميع الجمعيات</option></select>
+    <label>المرحلة:</label>
+    <select id="fTPh" onchange="renderTasks()">
+      <option value="">جميع المراحل</option>
+      <option value="المرحلة الأولى">المرحلة الأولى</option>
+      <option value="المرحلة الثانية">المرحلة الثانية</option>
+      <option value="المرحلة الثالثة">المرحلة الثالثة</option>
+      <option value="المرحلة الرابعة">المرحلة الرابعة</option>
+    </select>
+    <label>الحالة:</label>
+    <select id="fTSt" onchange="renderTasks()">
+      <option value="">جميع الحالات</option>
+      <option value="done">مكتملة ✅</option>
+      <option value="in">جارية ⚡</option>
+      <option value="pend">معلقة ⏳</option>
+    </select>
+    <label>المسؤول:</label>
+    <select id="fTAs" onchange="renderTasks()"><option value="">الجميع</option></select>
+    <input type="text" id="fTQ" placeholder="🔍 بحث..." style="flex:1;min-width:120px" oninput="renderTasks()">
+    <button class="btn btn-sm btn-ghost" onclick="resetFilter('fTOrg','fTPh','fTSt','fTAs','fTQ');renderTasks()">مسح</button>
+  </div>
+  <div class="tw"><table class="tbl"><thead><tr>
+    <th>الجمعية</th><th>المرحلة</th><th>المهمة</th><th>المسؤول</th><th>الإنجاز</th><th>الحالة</th><th>البداية</th><th>النهاية</th><th>ملاحظات</th><th>إجراء</th>
+  </tr></thead><tbody id="taskBody"></tbody></table></div>
+</div>
+
+<!-- GANTT -->
+<div id="pg-gantt" class="pg">
+  <div class="ph"><div><div class="ph-title">الجداول الزمنية</div><div class="ph-sub">رؤية مرئية لتقدم المهام عبر الأشهر</div></div></div>
+  <div class="fbar">
+    <label>الجمعية:</label>
+    <select id="fGOrg" onchange="renderGantt()"><option value="">جميع الجمعيات</option></select>
+    <button class="btn btn-sm btn-ghost" onclick="resetFilter('fGOrg');renderGantt()">مسح</button>
+  </div>
+  <div class="card"><div class="tw"><div id="ganttWrap"></div></div></div>
+</div>
+
+<!-- EVAL -->
+<div id="pg-eval" class="pg">
+  <div class="ph">
+    <div><div class="ph-title">التقييم القبلي والبعدي</div><div class="ph-sub">قياس أثر تدخل كريستون على الجمعيات</div></div>
+    <div class="ph-r"><button class="btn btn-primary btn-sm adm-act" onclick="openEvalM()">✏️ تحديث تقييم</button></div>
+  </div>
+  <div class="fbar">
+    <label>الجمعية:</label>
+    <select id="fEOrg" onchange="renderEval()"><option value="">جميع الجمعيات</option></select>
+    <button class="btn btn-sm btn-ghost" onclick="resetFilter('fEOrg');renderEval()">مسح</button>
+  </div>
+  <div class="card" id="evalContent"></div>
+</div>
+
+<!-- ACTIVITY -->
+<div id="pg-activity" class="pg">
+  <div class="ph">
+    <div><div class="ph-title">سجل النشاط</div><div class="ph-sub">تاريخ كامل لجميع التعديلات</div></div>
+    <div class="ph-r">
+      <button class="btn btn-sm" onclick="syncNow()">🔄 تحديث</button>
+      <button class="btn btn-del btn-sm adm-act" onclick="if(confirm('مسح كل السجل؟')){ACTIVITY_LOG=[];pushData('ACTIVITY',activityToRows());renderActivity();toast('🗑️ تم مسح السجل')}">🗑️ مسح السجل</button>
+    </div>
+  </div>
+  <div class="fbar">
+    <label>المستخدم:</label>
+    <select id="fAUs" onchange="renderActivity()"><option value="">الجميع</option></select>
+    <label>النوع:</label>
+    <select id="fAType" onchange="renderActivity()">
+      <option value="">جميع الأنواع</option>
+      <option value="تحديث مهمة">تحديث مهمة</option>
+      <option value="تعديل جمعية">تعديل جمعية</option>
+      <option value="إضافة جمعية">إضافة جمعية</option>
+      <option value="تحديث تقييم">تحديث تقييم</option>
+      <option value="إضافة مستخدم">إضافة مستخدم</option>
+    </select>
+    <input type="text" id="fAQ" placeholder="🔍 بحث في السجل..." style="flex:1;min-width:150px" oninput="renderActivity()">
+    <button class="btn btn-sm btn-ghost" onclick="resetFilter('fAUs','fAType','fAQ');renderActivity()">مسح</button>
+  </div>
+  <div class="card" id="actContent"></div>
+</div>
+
+<!-- REPORT -->
+<div id="pg-report" class="pg">
+  <div class="ph">
+    <div><div class="ph-title">التقارير</div><div class="ph-sub">تقرير مفصل لكل جمعية قابل للطباعة</div></div>
+    <div class="ph-r no-print">
+      <button class="btn btn-sm" onclick="exportCSV()">📥 تصدير CSV</button>
+      <button class="btn btn-primary btn-sm" onclick="printReport()">🖨️ طباعة التقرير</button>
+    </div>
+  </div>
+  <div class="fbar no-print">
+    <label>اختر الجمعية:</label>
+    <select id="fRepOrg" onchange="renderReport()"></select>
+  </div>
+  <div id="reportContent"></div>
+</div>
+
+<!-- TEAM -->
+<div id="pg-team" class="pg">
+  <div class="ph">
+    <div><div class="ph-title">فريق العمل</div><div class="ph-sub">إدارة المستخدمين والصلاحيات</div></div>
+    <div class="ph-r"><button class="btn btn-primary btn-sm adm-act" onclick="openAddUser()">+ إضافة عضو</button></div>
+  </div>
+  <div id="teamList"></div>
+</div>
+
+<!-- SETTINGS -->
+<div id="pg-settings" class="pg">
+  <div class="ph"><div><div class="ph-title">الإعدادات</div></div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="chd">تغيير كلمة المرور</div>
+      <div class="fg"><label class="fl">المستخدم</label><select class="fi" id="pwSel"></select></div>
+      <div class="fg"><label class="fl">كلمة المرور الجديدة</label><input class="fi" type="password" id="pwNew" placeholder="6 أحرف على الأقل"></div>
+      <button class="btn btn-primary" onclick="changePw()">💾 حفظ</button>
+      <div id="pwMsg" style="font-size:11px;margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <div class="chd">رابط Google Apps Script</div>
+      <div class="fg"><label class="fl">رابط الـ API</label><input class="fi" id="apiUrlInp" placeholder="https://script.google.com/macros/s/..."></div>
+      <button class="btn btn-primary" onclick="saveApiUrl()">💾 حفظ الرابط</button>
+      <div style="margin-top:10px;font-size:11px;color:var(--text2)">الحالي: <span id="curApiUrl" style="color:var(--blue);font-size:10px;word-break:break-all"></span></div>
+      <div style="margin-top:10px">
+        <button class="btn btn-sm" onclick="pushInitialData()">📤 رفع البيانات الافتراضية للـ Sheet</button>
+        <div style="font-size:10px;color:var(--text2);margin-top:4px">استخدم هذا الزر مرة واحدة فقط عند إعداد النظام لأول مرة</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODALS -->
+
+<!-- Org -->
+<div class="mback" id="orgModal">
+<div class="mbox">
+  <div class="mtitle">🏢 <span id="orgMTitle">إضافة جمعية</span></div>
+  <input type="hidden" id="orgEId">
+  <div class="fr"><div class="fg"><label class="fl">اسم الجمعية *</label><input class="fi" id="oName"></div><div class="fg"><label class="fl">رقم الترخيص</label><input class="fi" id="oLic"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">المدينة</label><select class="fi" id="oCity"><option>الرياض</option><option>الشرقية</option><option>جدة</option><option>مكة</option><option>المدينة</option><option>أخرى</option></select></div><div class="fg"><label class="fl">سنة التأسيس</label><input class="fi" type="number" id="oFnd" value="2020"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">البرنامج المحاسبي</label><input class="fi" id="oPrg" placeholder="أودو / قيود / زوهو..."></div><div class="fg"><label class="fl">الحالة</label><select class="fi" id="oStat"><option value="active">نشطة</option><option value="stopped">متوقفة</option></select></div></div>
+  <div class="fr"><div class="fg"><label class="fl">المدير التنفيذي</label><input class="fi" id="oCEO"></div><div class="fg"><label class="fl">المحاسب</label><input class="fi" id="oAcc"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">ضابط الاتصال</label><input class="fi" id="oCon"></div><div class="fg"><label class="fl">رقم الهاتف</label><input class="fi" id="oPhn"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">البريد الإلكتروني</label><input class="fi" id="oEml"></div><div class="fg"><label class="fl">التقييم القبلي (%)</label><input class="fi" type="number" id="oSco" min="0" max="100" value="0"></div></div>
+  <div class="mfoot"><button class="btn" onclick="closeM('orgModal')">إلغاء</button><button class="btn btn-primary" onclick="saveOrg()">💾 حفظ</button></div>
+</div>
+</div>
+
+<!-- Task -->
+<div class="mback" id="taskModal">
+<div class="mbox">
+  <div class="mtitle">✏️ تحديث المهمة</div>
+  <input type="hidden" id="tOId"><input type="hidden" id="tTId">
+  <div style="font-size:12px;color:var(--text2);margin-bottom:12px;padding:9px 12px;background:var(--bg3);border-radius:var(--r);font-weight:600" id="tInfo"></div>
+  <div class="fg"><label class="fl">المسؤول</label><select class="fi" id="tAsgn"></select></div>
+  <div class="fg">
+    <label class="fl">نسبة الإنجاز: <span id="tPv" style="color:var(--blue);font-weight:800">0%</span></label>
+    <input type="range" id="tPrg" min="0" max="100" step="5" value="0" style="width:100%;margin:6px 0" oninput="document.getElementById('tPv').textContent=this.value+'%'">
+    <div style="display:flex;gap:6px;margin-top:4px">
+      <button class="btn btn-sm" onclick="setP(0)">0%</button>
+      <button class="btn btn-sm" onclick="setP(25)">25%</button>
+      <button class="btn btn-sm" onclick="setP(50)">50%</button>
+      <button class="btn btn-sm" onclick="setP(75)">75%</button>
+      <button class="btn btn-ok btn-sm" onclick="setP(100)">✓ مكتمل</button>
+    </div>
+  </div>
+  <div class="fr"><div class="fg"><label class="fl">تاريخ البداية</label><input class="fi" type="date" id="tSt"></div><div class="fg"><label class="fl">تاريخ النهاية</label><input class="fi" type="date" id="tEn"></div></div>
+  <div class="fg"><label class="fl">ملاحظات</label><input class="fi" id="tNote" placeholder="ملاحظات على هذه المهمة..."></div>
+  <div class="mfoot"><button class="btn" onclick="closeM('taskModal')">إلغاء</button><button class="btn btn-primary" onclick="saveTask()">💾 حفظ وتزامن</button></div>
+</div>
+</div>
+
+<!-- Eval -->
+<div class="mback" id="evalModal">
+<div class="mbox" style="max-width:440px">
+  <div class="mtitle">📈 تحديث التقييم البعدي</div>
+  <div class="fg"><label class="fl">الجمعية</label><select class="fi" id="evalOrgM"></select></div>
+  <div class="fg"><label class="fl">التقييم البعدي (0-100)</label><input class="fi" type="number" id="evalAfter" min="0" max="100"></div>
+  <div class="fg"><label class="fl">أبرز التحسينات</label><textarea class="fi" id="evalNote" rows="3" placeholder="مثال: تهيئة الدليل المحاسبي، التسجيل في الزكاة..."></textarea></div>
+  <div class="mfoot"><button class="btn" onclick="closeM('evalModal')">إلغاء</button><button class="btn btn-primary" onclick="saveEval()">💾 حفظ وتزامن</button></div>
+</div>
+</div>
+
+<!-- User -->
+<div class="mback" id="userModal">
+<div class="mbox" style="max-width:420px">
+  <div class="mtitle">👤 إضافة عضو جديد</div>
+  <div class="fr"><div class="fg"><label class="fl">الاسم الكامل *</label><input class="fi" id="uFullName"></div><div class="fg"><label class="fl">اسم المستخدم *</label><input class="fi" id="uUsername"></div></div>
+  <div class="fg"><label class="fl">المسمى الوظيفي</label><input class="fi" id="uJobTitle" placeholder="مثال: مدقق حسابات"></div>
+  <div class="fr"><div class="fg"><label class="fl">مستوى الصلاحية</label><select class="fi" id="uLvl"><option value="admin">صلاحيات كاملة</option><option value="readonly">اطلاع فقط</option></select></div><div class="fg"><label class="fl">كلمة المرور</label><input class="fi" type="password" id="uPw" placeholder="6 أحرف على الأقل"></div></div>
+  <div class="mfoot"><button class="btn" onclick="closeM('userModal')">إلغاء</button><button class="btn btn-primary" onclick="saveUser()">💾 حفظ</button></div>
+</div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="mback" id="editUserModal">
+<div class="mbox" style="max-width:400px">
+  <div class="mtitle">✏️ تعديل بيانات العضو</div>
+  <input type="hidden" id="editUId">
+  <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding:9px 12px;background:var(--bg3);border-radius:var(--r)" id="editUName"></div>
+  <div class="fg"><label class="fl">المسمى الوظيفي</label><input class="fi" id="editURole"></div>
+  <div class="fg"><label class="fl">مستوى الصلاحية</label>
+    <select class="fi" id="editULvl">
+      <option value="admin">صلاحيات كاملة</option>
+      <option value="readonly">اطلاع فقط</option>
+    </select>
+  </div>
+  <div class="mfoot">
+    <button class="btn" onclick="closeM('editUserModal')">إلغاء</button>
+    <button class="btn btn-primary" onclick="saveEditUser()">💾 حفظ</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCRIPT
+══════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── CONFIG ── */
+let API_URL = localStorage.getItem('fp_api') || 'https://script.google.com/macros/s/AKfycbxScHV0HnLeItL-D4kUCD__UB8EXpwACpRPemEWxves1GdXvxx5yTs_VyZAisF209Yg/exec';
+
+/* ── DATA DEFAULTS ── */
+const DEF_USERS = {
+  msalem:{name:'محمد سالم',role:'مدير المشروع',level:'admin',pw:'kreston2026',ava:'مس',cls:'av-b'},
+  ibrahim:{name:'إبراهيم',role:'مدير — أثر الشباب',level:'admin',pw:'athar2026',ava:'إب',cls:'av-g'},
+  hashem:{name:'هاشم',role:'محلل مالي',level:'admin',pw:'hashem123',ava:'هش',cls:'av-p'},
+  fatima:{name:'فاطمة',role:'موظفة',level:'readonly',pw:'fatima123',ava:'فط',cls:'av-x'},
+};
+
+const DEF_ORGS = [
+  {id:1,name:'جمعية طود لتنمية الشباب',city:'الرياض',program:'أودو',license:'ج-1002',founded:2018,score:55,scoreAfter:72,scoreNote:'تهيئة الدليل المحاسبي وبدء التسجيل',pct:0,status:'active',contact:'عبد الله',phone:'0500203410',email:'a.alobath@gmail.com',ceo:'أحمد الحربي',accountant:'—'},
+  {id:2,name:'جمعية نموذج',city:'الشرقية',program:'أودو',license:'ج-1015',founded:2016,score:3,scoreAfter:35,scoreNote:'توقيع العقد وتفعيل البرنامج',pct:0,status:'active',contact:'حسام الغامدي',phone:'0531108281',email:'hussam@model.org.sa',ceo:'—',accountant:'—'},
+  {id:3,name:'جمعية أكواف',city:'الرياض',program:'قيود',license:'ج-1031',founded:2019,score:19,scoreAfter:55,scoreNote:'التسجيل في الزكاة وتهيئة البرنامج',pct:0,status:'active',contact:'—',phone:'—',email:'Fin@akwaf.sa',ceo:'—',accountant:'—'},
+  {id:4,name:'جمعية صانع',city:'الرياض',program:'—',license:'ج-1042',founded:2020,score:20,scoreAfter:20,scoreNote:'لم يتم التقييم بعد',pct:0,status:'stopped',contact:'محمد المروتي',phone:'0559985375',email:'malmorouti@sani.dev',ceo:'—',accountant:'—'},
+  {id:5,name:'جمعية دال',city:'الشرقية',program:'—',license:'ج-1055',founded:2017,score:0,scoreAfter:0,scoreNote:'لم يتم التقييم بعد',pct:0,status:'stopped',contact:'—',phone:'—',email:'—',ceo:'—',accountant:'—'},
+  {id:6,name:'جمعية سلاسل الإمداد',city:'الرياض',program:'عيناك',license:'ج-1063',founded:2015,score:47,scoreAfter:65,scoreNote:'اجتماع حضوري وتهيئة الدليل',pct:0,status:'active',contact:'فاطمة عبد الهادي',phone:'0591407787',email:'f.albannawi@saudiscp.org',ceo:'—',accountant:'هاشم سقا'},
+  {id:7,name:'جمعية صناعة القدرات الشبابية',city:'الرياض',program:'رافد',license:'ج-1074',founded:2019,score:51,scoreAfter:68,scoreNote:'بدء التسجيل المحاسبي للربع الأول',pct:0,status:'active',contact:'—',phone:'—',email:'—',ceo:'—',accountant:'—'},
+  {id:8,name:'جمعية الجري الرياضية',city:'الرياض',program:'قيود',license:'ج-1088',founded:2021,score:0,scoreAfter:0,scoreNote:'لم يتم التقييم بعد',pct:0,status:'stopped',contact:'—',phone:'0563199175',email:'hussain@rur.sa',ceo:'—',accountant:'—'},
+  {id:9,name:'جمعية فايرين',city:'الشرقية',program:'قيود',license:'ج-1091',founded:2020,score:19,scoreAfter:60,scoreNote:'إلغاء ضريبة غير مستحقة وتفعيل البرنامج',pct:0,status:'active',contact:'خالد السنان',phone:'0563199175',email:'Khalid@Vireen.sa',ceo:'—',accountant:'—'},
+  {id:10,name:'جمعية نقش',city:'الرياض',program:'زوهو',license:'ج-1103',founded:2018,score:25,scoreAfter:52,scoreNote:'تعديل البرنامج المحاسبي وتهيئة الدليل',pct:0,status:'active',contact:'بسام أكرم الدين',phone:'0537736202',email:'Bassam@nuqsh.org',ceo:'—',accountant:'—'},
+  {id:11,name:'جمعية شباب مجتمعي',city:'الرياض',program:'—',license:'ج-1117',founded:2022,score:16,scoreAfter:16,scoreNote:'لم يتم التقييم بعد',pct:0,status:'stopped',contact:'—',phone:'—',email:'—',ceo:'—',accountant:'—'}
+];
+
+const PHASES = ['المرحلة الأولى','المرحلة الثانية','المرحلة الثالثة','المرحلة الرابعة'];
+
+const MASTER_TASKS = [
+  {id:'T01',phase:'المرحلة الأولى',name:'توقيع خطاب الارتباط مع المنظمة',ts:'2026-01-07',te:'2026-01-31'},
+  {id:'T02',phase:'المرحلة الأولى',name:'استلام الوثائق التأسيسية',ts:'2026-01-07',te:'2026-01-31'},
+  {id:'T03',phase:'المرحلة الأولى',name:'دراسة الوثائق التأسيسية',ts:'2026-01-15',te:'2026-02-15'},
+  {id:'T04',phase:'المرحلة الأولى',name:'الزيارة الميدانية للجمعية',ts:'2026-01-20',te:'2026-02-20'},
+  {id:'T05',phase:'المرحلة الأولى',name:'معيار تقييم رفع كفاءة الإدارة المالية',ts:'2026-01-25',te:'2026-02-28'},
+  {id:'T06',phase:'المرحلة الثانية',name:'تزويدنا بضابط الاتصال',ts:'2026-02-01',te:'2026-02-15'},
+  {id:'T07',phase:'المرحلة الثانية',name:'الاشتراك في البرنامج المحاسبي',ts:'2026-01-15',te:'2026-03-15'},
+  {id:'T08',phase:'المرحلة الثانية',name:'تهيئة دليل الحسابات المحاسبي',ts:'2026-02-01',te:'2026-04-30'},
+  {id:'T09',phase:'المرحلة الثانية',name:'التسجيل في هيئة الزكاة والضريبة والجمارك',ts:'2026-02-01',te:'2026-04-30'},
+  {id:'T10',phase:'المرحلة الثانية',name:'الاجتماع لمناقشة مراحل سير المشروع',ts:'2026-01-20',te:'2026-02-28'},
+  {id:'T11',phase:'المرحلة الثالثة',name:'التسجيل المحاسبي لعمليات 2026',ts:'2026-02-01',te:'2026-12-31'},
+  {id:'T12',phase:'المرحلة الثالثة',name:'متابعة اعتماد القوائم المالية 2025',ts:'2026-01-01',te:'2026-06-30'},
+  {id:'T13',phase:'المرحلة الثالثة',name:'إعداد الموازنة التقديرية لعام 2027',ts:'2026-09-01',te:'2026-12-31'},
+  {id:'T14',phase:'المرحلة الثالثة',name:'إعداد اللوائح المالية',ts:'2026-04-01',te:'2026-08-31'},
+  {id:'T15',phase:'المرحلة الثالثة',name:'الإقرارات الزكوية السنوية 2025',ts:'2026-01-01',te:'2026-06-30'},
+  {id:'T16',phase:'المرحلة الرابعة',name:'إعداد قوائم مالية ربع سنوية',ts:'2026-04-01',te:'2026-12-31'},
+  {id:'T17',phase:'المرحلة الرابعة',name:'التعاقد مع المحاسب القانوني',ts:'2026-03-01',te:'2026-06-30'},
+  {id:'T18',phase:'المرحلة الرابعة',name:'تجهيز متطلبات المراجع القانوني 2026',ts:'2026-06-01',te:'2026-12-31'},
+  {id:'T19',phase:'المرحلة الرابعة',name:'تحليل مقياس الاستدامة المالية',ts:'2026-07-01',te:'2026-12-31'}
+];
+
+// Build default task data for each org
+function buildDefTasks(){
+  const dt = {};
+  DEF_ORGS.forEach(o=>{
+    dt[o.id]={};
+    MASTER_TASKS.forEach(t=>{ dt[o.id][t.id]={pct:0,note:'',start:'',end:'',assignee:''}; });
+  });
+  // Seed some real data for first 3 orgs
+  const seed = {
+    1:{T01:{pct:100,note:'تم التوقيع',start:'2026-01-01',end:'2026-01-13',assignee:'msalem'},T02:{pct:100,note:'تم',start:'2026-01-14',end:'2026-01-20',assignee:'hashem'},T03:{pct:100,note:'تم',start:'2026-01-21',end:'2026-01-28',assignee:'hashem'},T04:{pct:100,note:'تم',start:'2026-01-25',end:'2026-01-28',assignee:'msalem'},T05:{pct:100,note:'تم',start:'2026-01-28',end:'2026-02-10',assignee:'hashem'},T06:{pct:100,note:'تم',assignee:''},T07:{pct:40,note:'شجرة حسابات غير مطابقة',start:'2026-01-13',end:'',assignee:'hashem'},T10:{pct:100,note:'تم الاجتماع',start:'2026-01-28',end:'2026-01-28',assignee:'msalem'},T12:{pct:30,note:'جاري',assignee:'hashem'}},
+    2:{T01:{pct:100,note:'تم التوقيع',start:'2026-01-07',end:'2026-01-18',assignee:'msalem'},T02:{pct:100,note:'تم',assignee:''},T03:{pct:100,note:'تم',assignee:''},T04:{pct:100,note:'تم',assignee:''},T05:{pct:100,note:'تم',assignee:''},T06:{pct:100,note:'تم',assignee:''},T07:{pct:70,note:'جاري معالجة مشكلة الدليل',start:'2026-01-29',end:'',assignee:'hashem'},T09:{pct:100,note:'مسجلة لدى الهيئة',assignee:''},T10:{pct:100,note:'تم الاجتماع',start:'2026-01-29',end:'2026-01-29',assignee:'msalem'},T12:{pct:25,note:'جاري',assignee:'hashem'}},
+    3:{T01:{pct:100,note:'تم التوقيع',assignee:'msalem'},T02:{pct:100,note:'تم',assignee:''},T03:{pct:100,note:'تم',assignee:''},T04:{pct:100,note:'تم',assignee:''},T06:{pct:100,note:'تم',assignee:''},T07:{pct:100,note:'مكتمل',assignee:'hashem'},T08:{pct:0,note:'الدليل لا يتوافق مع المركز الوطني',assignee:''},T09:{pct:100,note:'تم التسجيل',assignee:''},T10:{pct:100,note:'تم الاجتماع',assignee:'msalem'},T12:{pct:25,note:'جاري',assignee:''}},
+  };
+  Object.entries(seed).forEach(([oid,tasks])=>{
+    Object.entries(tasks).forEach(([tid,tv])=>{ dt[+oid][tid]={...dt[+oid][tid],...tv}; });
+  });
+  return dt;
+}
+
+/* ── STATE ── */
+let USERS = JSON.parse(JSON.stringify(DEF_USERS));
+let ORGS = JSON.parse(JSON.stringify(DEF_ORGS));
+let ORG_TASKS = buildDefTasks();
+let ACTIVITY_LOG = [];
+let CU = null; // current user key
+let syncing = false;
+let lastSyncTime = null;
+
+/* ── HELPERS ── */
+const isAdmin = () => CU && USERS[CU] && USERS[CU].level === 'admin';
+const closeM = id => document.getElementById(id).classList.remove('open');
+const getOrg = id => ORGS.find(o => o.id === +id);
+const uName = uid => (uid && USERS[uid]) ? USERS[uid].name : '';
+const clr = p => p===100?'#15803D':p>0?'#1B4FD8':'#CBD5E1';
+const bar = (p,h=6) => `<div class="pbar" style="height:${h}px"><div class="pbf" style="width:${p}%;height:${h}px;background:${clr(p)}"></div></div>`;
+const pill = p => p===100?'<span class="pill p-s">مكتمل</span>':p>0?'<span class="pill p-i">جاري</span>':'<span class="pill p-w">معلق</span>';
+const fmt = d => d?d.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'}):'';
+const el = id => document.getElementById(id);
+
+function resetFilter(...ids){ ids.forEach(id=>{ const e=el(id); if(e){e.tagName==='SELECT'?e.value='':e.value='';} }); }
+
+function avgOrgPct(orgId){
+  const d = ORG_TASKS[orgId];
+  if(!d) return 0;
+  const vals = Object.values(d).map(x=>x.pct);
+  return vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : 0;
+}
+function recalcPcts(){ ORGS.forEach(o=>{ o.pct = avgOrgPct(o.id); }); }
+
+/* ── TOAST ── */
+function toast(msg, ms=3000){
+  const t = el('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), ms);
+}
+
+/* ── SYNC ── */
+function syncStatus(state){ // 'ok','syncing','err'
+  const dot=el('sdot'), lbl=el('slbl'), bar=el('syncBar');
+  dot.className='sd'+(state==='syncing'?' sync':state==='err'?' err':'');
+  lbl.textContent=state==='syncing'?'جاري المزامنة...':state==='err'?'تعذّرت المزامنة':'البيانات محدّثة';
+  bar.className='';
+  if(state==='syncing'){bar.classList.add('on');}
+  syncing=state==='syncing';
+}
+
+async function syncNow(){
+  if(syncing) return;
+  syncStatus('syncing');
+  try{
+    const res = await fetch(API_URL+'?action=read&t='+Date.now());
+    const json = await res.json();
+    if(json.success && json.data){
+      applySheet(json.data);
+      lastSyncTime = new Date();
+      el('stm').textContent = fmt(lastSyncTime);
+      syncStatus('ok');
+      toast('✅ تمت المزامنة');
+    } else { throw new Error('no data'); }
+  } catch(e){
+    syncStatus('err');
+    toast('⚠️ لم تتم المزامنة — يعمل بالبيانات المحلية');
+  }
+  recalcPcts();
+  refreshAll();
+}
+
+async function pushData(sheet, rows){
+  try{
+    const params = new URLSearchParams({
+      action: 'write',
+      sheet: sheet,
+      rows: encodeURIComponent(JSON.stringify(rows))
+    });
+    const res = await fetch(API_URL + '?' + params.toString());
+    const json = await res.json();
+    if(!json.success) console.warn('Push warn:', sheet, json);
+  } catch(e){ console.warn('Push failed:', sheet, e.message); }
+}
+
+async function pushInitialData(){
+  toast('⏳ جاري رفع البيانات...',8000);
+  await pushData('ORGS', orgsToRows());
+  await pushData('TASKS', tasksToRows());
+  await pushData('USERS', usersToRows());
+  await pushData('ACTIVITY', activityToRows());
+  toast('✅ تم رفع البيانات الافتراضية بنجاح');
+}
+
+/* ── SHEET ↔ APP ── */
+function applySheet(data){
+  if(data['ORGS'] && data['ORGS'].length>1){
+    const rows = data['ORGS'].slice(1);
+    ORGS = rows.map(r=>({
+      id:+r[0],name:r[1],city:r[2],program:r[3],license:r[4],founded:+r[5],
+      score:+r[6],scoreAfter:+r[7],scoreNote:r[8]||'',pct:+r[9],
+      status:r[10],contact:r[11]||'',phone:r[12]||'',email:r[13]||'',
+      ceo:r[14]||'',accountant:r[15]||''
+    }));
+  }
+  if(data['TASKS'] && data['TASKS'].length>1){
+    ORG_TASKS={};
+    data['TASKS'].slice(1).forEach(r=>{
+      const oid=+r[0], tid=String(r[1]);
+      if(!ORG_TASKS[oid]) ORG_TASKS[oid]={};
+      ORG_TASKS[oid][tid]={pct:+r[2]||0,note:r[3]||'',start:r[4]||'',end:r[5]||'',assignee:r[6]||''};
+    });
+    // Fill missing tasks
+    ORGS.forEach(o=>{
+      if(!ORG_TASKS[o.id]) ORG_TASKS[o.id]={};
+      MASTER_TASKS.forEach(t=>{ if(!ORG_TASKS[o.id][t.id]) ORG_TASKS[o.id][t.id]={pct:0,note:'',start:'',end:'',assignee:''}; });
+    });
+  }
+  if(data['USERS'] && data['USERS'].length>1){
+    USERS={};
+    data['USERS'].slice(1).forEach(r=>{
+      if(!r[0]) return;
+      USERS[r[0]]={name:r[1],role:r[2],level:r[3],pw:r[4],ava:(r[1]||'').split(' ').slice(0,2).map(w=>w[0]).join(''),cls:r[5]||'av-x'};
+    });
+    if(Object.keys(USERS).length===0) USERS={...JSON.parse(JSON.stringify(DEF_USERS))};
+  }
+  if(data['ACTIVITY'] && data['ACTIVITY'].length>1){
+    ACTIVITY_LOG = data['ACTIVITY'].slice(1).filter(r=>r[0]).map(r=>({ts:r[0],user:r[1]||'',action:r[2]||'',details:r[3]||''})).reverse();
+  }
+}
+
+function orgsToRows(){
+  return [['id','name','city','program','license','founded','score','scoreAfter','scoreNote','pct','status','contact','phone','email','ceo','accountant'],
+    ...ORGS.map(o=>[o.id,o.name,o.city,o.program||'',o.license||'',o.founded,o.score,o.scoreAfter,o.scoreNote||'',o.pct,o.status,o.contact||'',o.phone||'',o.email||'',o.ceo||'',o.accountant||''])];
+}
+function tasksToRows(){
+  const rows=[['orgId','taskId','pct','note','start','end','assignee']];
+  Object.entries(ORG_TASKS).forEach(([oid,tasks])=>{
+    Object.entries(tasks).forEach(([tid,t])=>{ rows.push([+oid,tid,t.pct,t.note||'',t.start||'',t.end||'',t.assignee||'']); });
+  });
+  return rows;
+}
+function usersToRows(){
+  return [['id','name','role','level','pw','cls'],
+    ...Object.entries(USERS).map(([id,u])=>[id,u.name,u.role,u.level,u.pw,u.cls||'av-x'])];
+}
+function activityToRows(){
+  return [['ts','user','action','details'],
+    ...[...ACTIVITY_LOG].reverse().map(a=>[a.ts,a.user,a.action,a.details])];
+}
+
+function logAct(action, details){
+  ACTIVITY_LOG.unshift({ts:new Date().toLocaleString('ar-SA'),user:USERS[CU]?.name||CU,action,details});
+  pushData('ACTIVITY', activityToRows());
+}
+
+/* ── LOGIN / LOGOUT ── */
+function doLogin(){
+  const u=el('uIn').value.trim(), p=el('pIn').value;
+  if(USERS[u] && USERS[u].pw===p){
+    CU=u;
+    el('lErr').style.display='none';
+    el('lWrap').style.display='none';
+    el('aWrap').style.display='flex';
+    const av=el('sbAva');
+    av.className='ava '+(USERS[u].cls||'av-x');
+    av.textContent=USERS[u].ava||USERS[u].name[0];
+    el('sbName').textContent=USERS[u].name;
+    el('sbRole').textContent=USERS[u].role;
+    if(!isAdmin()){
+      document.querySelectorAll('.adm-nav,.adm-act').forEach(e=>e.style.display='none');
+    }
+    el('apiUrlInp').value=API_URL;
+    el('curApiUrl').textContent=API_URL;
+    initSelects();
+    syncNow();
+  } else {
+    el('lErr').style.display='block';
+    el('pIn').value='';
+  }
+}
+function doLogout(){
+  CU=null; el('lWrap').style.display='flex'; el('aWrap').style.display='none';
+  el('uIn').value=''; el('pIn').value='';
+  document.querySelectorAll('.adm-nav,.adm-act').forEach(e=>e.style.display='');
+}
+el('pIn').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+el('uIn').addEventListener('keydown',e=>{if(e.key==='Enter')el('pIn').focus();});
+
+/* ── NAV ── */
+function pg(id,navEl){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));
+  el('pg-'+id).classList.add('on');
+  navEl.classList.add('on');
+  const renders = {dash:renderDash,orgs:renderOrgs,tasks:renderTasks,gantt:renderGantt,eval:renderEval,activity:renderActivity,report:renderReport,team:renderTeam,settings:renderSettings};
+  if(renders[id]) renders[id]();
+}
+
+/* ── INIT SELECTS ── */
+function initSelects(){
+  const orgOpts = ORGS.map(o=>`<option value="${o.id}">${o.name}</option>`).join('');
+  const blankOrg = '<option value="">جميع الجمعيات</option>';
+  ['fTOrg','fGOrg','fEOrg'].forEach(id=>{ if(el(id)) el(id).innerHTML=blankOrg+orgOpts; });
+  if(el('fRepOrg')) el('fRepOrg').innerHTML=orgOpts;
+  if(el('evalOrgM')) el('evalOrgM').innerHTML=orgOpts;
+
+  // Task assignee filter — use username as value
+  const asOpts='<option value="">الجميع</option>'+Object.entries(USERS).filter(([,u])=>u.level==='admin').map(([id,u])=>`<option value="${id}">${u.name}</option>`).join('');
+  if(el('fTAs')) el('fTAs').innerHTML=asOpts;
+
+  // Task assignee in modal
+  const asM='<option value="">— غير محدد —</option>'+Object.entries(USERS).filter(([,u])=>u.level==='admin').map(([id,u])=>`<option value="${id}">${u.name}</option>`).join('');
+  if(el('tAsgn')) el('tAsgn').innerHTML=asM;
+
+  // Activity user filter
+  const auOpts='<option value="">الجميع</option>'+Object.values(USERS).map(u=>`<option value="${u.name}">${u.name}</option>`).join('');
+  if(el('fAUs')) el('fAUs').innerHTML=auOpts;
+
+  if(el('pwSel')) el('pwSel').innerHTML=Object.entries(USERS).map(([id,u])=>`<option value="${id}">${u.name}</option>`).join('');
+}
+
+function refreshAll(){
+  recalcPcts();
+  initSelects();
+  const active = el('aWrap').querySelector('.pg.on');
+  if(active){
+    const id = active.id.replace('pg-','');
+    const renders = {dash:renderDash,orgs:renderOrgs,tasks:renderTasks,gantt:renderGantt,eval:renderEval,activity:renderActivity,report:renderReport,team:renderTeam};
+    if(renders[id]) renders[id]();
+  }
+}
+
+/* ══ DASH ══ */
+function renderDash(){
+  recalcPcts();
+  const active=ORGS.filter(o=>o.status==='active');
+  const stopped=ORGS.filter(o=>o.status==='stopped');
+  const avg=ORGS.length?Math.round(ORGS.reduce((a,o)=>a+o.pct,0)/ORGS.length):0;
+  let done=0,inp=0,pend=0,tot=0;
+  ORGS.forEach(o=>{
+    const d=ORG_TASKS[o.id]||{};
+    Object.values(d).forEach(t=>{tot++;if(t.pct===100)done++;else if(t.pct>0)inp++;else pend++;});
+  });
+  el('k1').textContent=ORGS.length; el('k2').textContent=active.length;
+  el('k3').textContent=stopped.length; el('k4').textContent=avg+'%';
+  el('k5').textContent=done; el('k6').textContent=inp;
+  el('k7').textContent=pend; el('k8').textContent=tot;
+
+  el('dProg').innerHTML=[...ORGS].sort((a,b)=>b.pct-a.pct).map(o=>`
+    <div class="prow">
+      <span class="pn" title="${o.name}">${o.name.replace('جمعية ','')}</span>
+      ${bar(o.pct)}<span class="ppc" style="color:${clr(o.pct)}">${o.pct}%</span>
+    </div>`).join('');
+
+  el('dPhase').innerHTML=PHASES.map(ph=>{
+    const tasks=MASTER_TASKS.filter(t=>t.phase===ph);
+    let s=0,c=0;
+    ORGS.forEach(o=>{tasks.forEach(t=>{const d=ORG_TASKS[o.id];if(d&&d[t.id]){s+=d[t.id].pct;c++;}});});
+    const av=c?Math.round(s/c):0;
+    return `<div class="prow"><span class="pn">${ph}</span>${bar(av)}<span class="ppc" style="color:${clr(av)}">${av}%</span></div>`;
+  }).join('');
+
+  el('dGrid').innerHTML=ORGS.map(o=>`
+    <div class="org-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+        <span style="font-size:11px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.name.replace('جمعية ','')}</span>
+        <span class="pill ${o.status==='active'?'p-s':'p-d'}" style="font-size:9px;margin-right:6px">${o.status==='active'?'نشط':'متوقف'}</span>
+      </div>
+      ${bar(o.pct,5)}
+      <div style="display:flex;justify-content:space-between;margin-top:5px">
+        <span style="font-size:10px;color:var(--text2)">${o.city}</span>
+        <span style="font-size:12px;font-weight:800;color:${clr(o.pct)}">${o.pct}%</span>
+      </div>
+    </div>`).join('');
+}
+
+/* ══ ORGS ══ */
+function renderOrgs(){
+  const sf=el('fOrgSt').value, cf=el('fOrgCi').value, q=el('fOrgQ').value.trim().toLowerCase();
+  const list=ORGS.filter(o=>{
+    if(sf && o.status!==sf) return false;
+    if(cf && o.city!==cf) return false;
+    if(q && !o.name.toLowerCase().includes(q) && !o.contact.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const adm=isAdmin();
+  el('orgBody').innerHTML = list.length ? list.map(o=>`
+    <tr>
+      <td style="font-weight:700;color:var(--text2);font-size:11px">${o.id}</td>
+      <td><div style="font-weight:700">${o.name}</div><div style="font-size:10px;color:var(--text2)">${o.license} · ${o.founded}</div></td>
+      <td>${o.city}</td>
+      <td><span style="font-weight:600">${o.program||'—'}</span></td>
+      <td><div>${o.contact||'—'}</div><div style="font-size:10px;color:var(--text2)">${o.phone||''}</div></td>
+      <td style="min-width:110px"><div style="display:flex;align-items:center;gap:6px">${bar(o.pct)}<b style="color:${clr(o.pct)}">${o.pct}%</b></div></td>
+      <td><span class="pill ${o.status==='active'?'p-s':'p-d'}">${o.status==='active'?'نشطة':'متوقفة'}</span></td>
+      <td><span style="font-weight:800;color:var(--red)">${o.score}%</span> → <span style="font-weight:800;color:var(--green)">${o.scoreAfter}%</span></td>
+      <td>${adm?`<div style="display:flex;gap:4px"><button class="btn btn-edit btn-sm" onclick="openEditOrg(${o.id})">✏️ تعديل</button><button class="btn btn-del btn-sm" onclick="deleteOrg(${o.id})">🗑️</button></div>`:''}</td>
+    </tr>`).join('')
+  : `<tr><td colspan="9"><div class="empty"><p>لا توجد نتائج مطابقة للفلتر</p></div></td></tr>`;
+}
+
+function openAddOrg(){
+  el('orgMTitle').textContent='إضافة جمعية';
+  el('orgEId').value='';
+  ['oName','oLic','oCEO','oAcc','oCon','oPhn','oEml','oPrg'].forEach(id=>{el(id).value='';});
+  el('oFnd').value=2020; el('oSco').value=0; el('oStat').value='active'; el('oCity').value='الرياض';
+  el('orgModal').classList.add('open');
+}
+function openEditOrg(id){
+  const o=getOrg(id); if(!o) return;
+  el('orgMTitle').textContent='تعديل الجمعية';
+  el('orgEId').value=id;
+  el('oName').value=o.name; el('oLic').value=o.license||''; el('oFnd').value=o.founded;
+  el('oPrg').value=o.program||''; el('oStat').value=o.status; el('oCity').value=o.city||'الرياض';
+  el('oCEO').value=o.ceo||''; el('oAcc').value=o.accountant||'';
+  el('oCon').value=o.contact||''; el('oPhn').value=o.phone||'';
+  el('oEml').value=o.email||''; el('oSco').value=o.score||0;
+  el('orgModal').classList.add('open');
+}
+function saveOrg(){
+  const editId=el('orgEId').value;
+  const name=el('oName').value.trim();
+  if(!name){alert('اسم الجمعية مطلوب'); return;}
+  const dat={name,license:el('oLic').value,city:el('oCity').value,founded:+el('oFnd').value,
+    program:el('oPrg').value,status:el('oStat').value,ceo:el('oCEO').value,
+    accountant:el('oAcc').value,contact:el('oCon').value,phone:el('oPhn').value,
+    email:el('oEml').value,score:+el('oSco').value||0};
+  if(editId){
+    const idx=ORGS.findIndex(o=>o.id===+editId);
+    if(idx>-1){ ORGS[idx]={...ORGS[idx],...dat}; }
+    logAct('تعديل جمعية',`تم تعديل بيانات ${name}`);
+  } else {
+    const newId=Math.max(...ORGS.map(o=>o.id),0)+1;
+    ORGS.push({id:newId,...dat,scoreAfter:0,scoreNote:'',pct:0});
+    ORG_TASKS[newId]={};
+    MASTER_TASKS.forEach(t=>{ORG_TASKS[newId][t.id]={pct:0,note:'',start:'',end:'',assignee:''};});
+    logAct('إضافة جمعية',`تمت إضافة ${name}`);
+  }
+  closeM('orgModal');
+  recalcPcts();
+  pushData('ORGS',orgsToRows());
+  initSelects(); renderOrgs(); renderDash();
+  toast('💾 تم الحفظ والمزامنة');
+}
+
+function deleteOrg(id){
+  const o=getOrg(id); if(!o) return;
+  if(!confirm('حذف جمعية "' + o.name + '" نهائياً؟\n\nتحذير: سيتم حذف جميع بيانات المهام المرتبطة بها.')) return;
+  ORGS = ORGS.filter(x=>x.id!==id);
+  delete ORG_TASKS[id];
+  logAct('حذف جمعية', 'تم حذف ' + o.name + ' نهائياً');
+  recalcPcts();
+  pushData('ORGS',orgsToRows());
+  pushData('TASKS',tasksToRows());
+  initSelects(); renderOrgs(); renderDash();
+  toast('🗑️ تم حذف الجمعية');
+}
+
+/* ══ TASKS ══ */
+let _editOrgId=null, _editTaskId=null;
+
+function renderTasks(){
+  const orgF  = el('fTOrg').value;   // '' or org id string
+  const phF   = el('fTPh').value;    // '' or phase name
+  const stF   = el('fTSt').value;    // '' | 'done' | 'in' | 'pend'
+  const asF   = el('fTAs').value;    // '' or username key
+  const q     = el('fTQ').value.trim().toLowerCase();
+  const adm   = isAdmin();
+
+  const orgsToShow = orgF ? ORGS.filter(o=>o.id===+orgF) : ORGS;
+  let rows='', count=0;
+
+  orgsToShow.forEach(org=>{
+    const d = ORG_TASKS[org.id]||{};
+    PHASES.forEach(ph=>{
+      if(phF && ph!==phF) return;
+      MASTER_TASKS.filter(t=>t.phase===ph).forEach(t=>{
+        const td = d[t.id]||{pct:0,note:'',assignee:'',start:'',end:''};
+
+        // STATUS FILTER (fixed)
+        if(stF==='done' && td.pct!==100) return;
+        if(stF==='in'   && !(td.pct>0 && td.pct<100)) return;
+        if(stF==='pend' && td.pct!==0) return;
+
+        // ASSIGNEE FILTER — compare username key, not name
+        if(asF && td.assignee!==asF) return;
+
+        // TEXT SEARCH
+        if(q && !t.name.toLowerCase().includes(q) && !org.name.toLowerCase().includes(q) && !td.note.toLowerCase().includes(q)) return;
+
+        const un=uName(td.assignee);
+        rows+=`<tr>
+          <td style="font-weight:600;white-space:nowrap;font-size:11px">${orgsToShow.length>1?org.name.replace('جمعية ',''):org.name}</td>
+          <td><span class="pill p-p" style="font-size:9px">${ph.replace('المرحلة ','م.')}</span></td>
+          <td style="max-width:180px;font-size:11px">${t.name}</td>
+          <td>${un?`<span class="atag">👤 ${un}</span>`:'<span style="color:var(--text3);font-size:10px">—</span>'}</td>
+          <td style="min-width:100px"><div style="display:flex;align-items:center;gap:5px">${bar(td.pct)}<b style="font-size:11px;color:${clr(td.pct)}">${td.pct}%</b></div></td>
+          <td>${pill(td.pct)}</td>
+          <td style="font-size:10px;color:var(--text2);white-space:nowrap">${td.start||'—'}</td>
+          <td style="font-size:10px;color:var(--text2);white-space:nowrap">${td.end||'—'}</td>
+          <td style="font-size:10px;color:var(--text2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(td.note||'').replace(/"/g,'')}">${td.note||'—'}</td>
+          <td>${adm?`<button class="btn btn-edit btn-sm" onclick="openTask(${org.id},'${t.id}')">تحديث</button>`:''}</td>
+        </tr>`;
+        count++;
+      });
+    });
+  });
+
+  el('taskBody').innerHTML = rows || `<tr><td colspan="10"><div class="empty"><p>لا توجد مهام مطابقة — جرّب تغيير الفلتر</p></div></td></tr>`;
+  el('taskStats').innerHTML = `<span style="font-size:11px;color:var(--text2);font-weight:600">${count} مهمة ظاهرة</span>`;
+}
+
+function openTask(orgId, taskId){
+  _editOrgId=+orgId; _editTaskId=taskId;
+  const org=getOrg(orgId), task=MASTER_TASKS.find(t=>t.id===taskId);
+  const td=(ORG_TASKS[+orgId]||{})[taskId]||{pct:0,note:'',start:'',end:'',assignee:''};
+  el('tInfo').textContent=`${org?.name||''} — ${task?.name||''}`;
+  el('tPrg').value=td.pct; el('tPv').textContent=td.pct+'%';
+  el('tSt').value=td.start||''; el('tEn').value=td.end||'';
+  el('tNote').value=td.note||'';
+  el('tAsgn').value=td.assignee||'';
+  el('taskModal').classList.add('open');
+}
+function setP(v){ el('tPrg').value=v; el('tPv').textContent=v+'%'; }
+function saveTask(){
+  const pct=+el('tPrg').value, note=el('tNote').value,
+        start=el('tSt').value, end=el('tEn').value,
+        assignee=el('tAsgn').value;
+  if(!ORG_TASKS[_editOrgId]) ORG_TASKS[_editOrgId]={};
+  const old=(ORG_TASKS[_editOrgId][_editTaskId]||{pct:0});
+  ORG_TASKS[_editOrgId][_editTaskId]={pct,note,start,end,assignee};
+  recalcPcts();
+  const org=getOrg(_editOrgId), task=MASTER_TASKS.find(t=>t.id===_editTaskId);
+  logAct('تحديث مهمة',`${org?.name||''} — ${task?.name||''}: ${old.pct}% → ${pct}%${assignee?' ('+uName(assignee)+')':''}`);
+  closeM('taskModal');
+  pushData('TASKS',tasksToRows());
+  pushData('ORGS',orgsToRows());
+  renderTasks(); renderDash();
+  toast('💾 تم حفظ المهمة ومزامنتها');
+}
+
+/* ══ GANTT ══ */
+function renderGantt(){
+  const orgF=el('fGOrg').value;
+  const orgsToShow = orgF ? ORGS.filter(o=>o.id===+orgF) : ORGS;
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  let html=`<table class="gantt-tbl" style="min-width:${800+months.length*48}px"><thead><tr>
+    <th>الجمعية</th><th style="min-width:160px">المهمة</th><th>%</th><th>المسؤول</th>
+    ${months.map(m=>`<th style="min-width:44px;text-align:center">${m}</th>`).join('')}
+  </tr></thead><tbody>`;
+
+  orgsToShow.forEach(org=>{
+    const d=ORG_TASKS[org.id]||{};
+    html+=`<tr><td colspan="${4+months.length}" style="background:var(--blue-l);color:var(--blue);font-weight:800;font-size:11px;padding:5px 8px">🏢 ${org.name} — ${org.pct}%</td></tr>`;
+    PHASES.forEach(ph=>{
+      html+=`<tr><td colspan="${4+months.length}" style="background:var(--bg3);font-size:10px;color:var(--text2);padding:3px 8px;font-weight:700">• ${ph}</td></tr>`;
+      MASTER_TASKS.filter(t=>t.phase===ph).forEach(t=>{
+        const td=d[t.id]||{pct:0,assignee:''};
+        const bc=clr(td.pct);
+        html+=`<tr><td></td><td style="font-size:10px;max-width:160px">${t.name}</td>
+          <td style="font-size:10px;font-weight:700;color:${bc}">${td.pct}%</td>
+          <td style="font-size:10px;white-space:nowrap">${td.assignee?uName(td.assignee):''}</td>`;
+        months.forEach((_,mi)=>{
+          const s=t.ts?+t.ts.split('-')[1]-1:-1, e=t.te?+t.te.split('-')[1]-1:-1;
+          html+=s<=mi&&mi<=e
+            ?`<td style="padding:3px 4px"><div class="gbar" style="background:${bc};opacity:${0.25+td.pct/100*0.75}"></div></td>`
+            :'<td></td>';
+        });
+        html+='</tr>';
+      });
+    });
+  });
+  html+='</tbody></table>';
+  el('ganttWrap').innerHTML=html;
+}
+
+/* ══ EVAL ══ */
+function renderEval(){
+  const f=el('fEOrg').value;
+  const list = f ? ORGS.filter(o=>o.id===+f) : ORGS;
+  el('evalContent').innerHTML=`<table class="tbl"><thead><tr>
+    <th>الجمعية</th><th>القبلي</th><th>البعدي</th><th>التحسن</th><th>أبرز التحسينات</th><th>إجراء</th>
+  </tr></thead><tbody>
+  ${list.map(o=>{
+    const d=o.scoreAfter-o.score;
+    return `<tr>
+      <td><b>${o.name}</b><div style="font-size:10px;color:var(--text2)">${o.city}</div></td>
+      <td><span style="font-size:16px;font-weight:800;color:var(--red)">${o.score}%</span></td>
+      <td><span style="font-size:16px;font-weight:800;color:var(--green)">${o.scoreAfter}%</span></td>
+      <td><span style="font-size:14px;font-weight:800;color:${d>0?'var(--green)':d<0?'var(--red)':'var(--text2)'}">${d>=0?'+':''}${d} نقطة</span></td>
+      <td style="font-size:11px;color:var(--text2);max-width:200px">${o.scoreNote||'—'}</td>
+      <td>${isAdmin()?`<button class="btn btn-edit btn-sm" onclick="openEvalOrg(${o.id})">✏️</button>`:''}</td>
+    </tr>`;
+  }).join('')}
+  </tbody></table>`;
+}
+function openEvalM(){ el('evalModal').classList.add('open'); }
+function openEvalOrg(id){
+  const o=getOrg(id); if(!o) return;
+  el('evalOrgM').value=id;
+  el('evalAfter').value=o.scoreAfter;
+  el('evalNote').value=o.scoreNote||'';
+  el('evalModal').classList.add('open');
+}
+function saveEval(){
+  const id=+el('evalOrgM').value, after=+el('evalAfter').value||0, note=el('evalNote').value;
+  const idx=ORGS.findIndex(o=>o.id===id);
+  if(idx>-1){ ORGS[idx].scoreAfter=after; ORGS[idx].scoreNote=note; }
+  logAct('تحديث تقييم',`${getOrg(id)?.name||''}: التقييم البعدي → ${after}%`);
+  closeM('evalModal');
+  pushData('ORGS',orgsToRows());
+  renderEval(); renderDash();
+  toast('💾 تم حفظ التقييم');
+}
+
+/* ══ ACTIVITY ══ */
+function renderActivity(){
+  const uf=el('fAUs').value, typeF=el('fAType').value, q=el('fAQ').value.trim().toLowerCase();
+  let list=[...ACTIVITY_LOG];
+  if(uf)     list=list.filter(a=>a.user===uf);
+  if(typeF)  list=list.filter(a=>a.action===typeF);
+  if(q)      list=list.filter(a=>(a.action+a.details+a.user).toLowerCase().includes(q));
+  const ac=el('actContent');
+  if(!list.length){
+    ac.innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3" stroke-linecap="round"/></svg><p>لا يوجد نشاط مسجل</p></div>`;
+    return;
+  }
+  ac.innerHTML=list.map(a=>{
+    const dotC=a.action.includes('إضافة')?'var(--green)':a.action.includes('حذف')?'var(--red)':'var(--blue)';
+    return `<div class="aitem">
+      <div class="adot" style="background:${dotC}"></div>
+      <div class="abody">
+        <div class="atext"><b>${a.action}</b> — ${a.details}</div>
+        <div class="ameta">👤 ${a.user} &nbsp;·&nbsp; 🕐 ${a.ts}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══ REPORT ══ */
+function renderReport(){
+  const id=+el('fRepOrg').value;
+  const o=getOrg(id); if(!o) return;
+  const d=ORG_TASKS[id]||{};
+  const totalT=MASTER_TASKS.length;
+  const doneT=Object.values(d).filter(t=>t.pct===100).length;
+  const avg=avgOrgPct(id);
+  const date=new Date().toLocaleDateString('ar-SA',{year:'numeric',month:'long',day:'numeric'});
+
+  let phHTML='';
+  PHASES.forEach(ph=>{
+    const pts=MASTER_TASKS.filter(t=>t.phase===ph);
+    const phDone=pts.filter(t=>(d[t.id]||{}).pct===100).length;
+    phHTML+=`<div class="card" style="margin-bottom:12px">
+      <div class="chd">${ph} <span style="font-size:11px;font-weight:500;color:var(--text2)">${phDone}/${pts.length} مكتملة</span></div>
+      <div class="tw"><table class="tbl"><thead><tr>
+        <th>المهمة</th><th>المسؤول</th><th>الإنجاز</th><th>الحالة</th><th>البداية</th><th>النهاية</th><th>ملاحظات</th>
+      </tr></thead><tbody>
+      ${pts.map(t=>{const td=d[t.id]||{pct:0};return`<tr>
+        <td style="font-size:11px">${t.name}</td>
+        <td>${td.assignee?`<span class="atag">👤 ${uName(td.assignee)}</span>`:'—'}</td>
+        <td><div style="display:flex;align-items:center;gap:5px;min-width:80px">${bar(td.pct,4)}<b style="font-size:11px">${td.pct}%</b></div></td>
+        <td>${pill(td.pct)}</td>
+        <td style="font-size:10px;white-space:nowrap">${td.start||'—'}</td>
+        <td style="font-size:10px;white-space:nowrap">${td.end||'—'}</td>
+        <td style="font-size:10px;color:var(--text2)">${td.note||'—'}</td>
+      </tr>`;}).join('')}
+      </tbody></table></div>
+    </div>`;
+  });
+
+  el('reportContent').innerHTML=`
+    <div class="rep-hdr">
+      <div style="font-size:11px;opacity:.8;margin-bottom:3px">شركة كريستون للاستشارات المالية</div>
+      <h2>تقرير متابعة مشروع رفع كفاءة الإدارة المالية</h2>
+      <p>${o.name} &nbsp;·&nbsp; تاريخ التقرير: ${date}</p>
+    </div>
+    <div class="g2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="chd">بيانات الجمعية</div>
+        <div style="font-size:12px;line-height:2.3">
+          <div><b>رقم الترخيص:</b> ${o.license||'—'}</div>
+          <div><b>سنة التأسيس:</b> ${o.founded||'—'}</div>
+          <div><b>المدينة:</b> ${o.city}</div>
+          <div><b>البرنامج المحاسبي:</b> ${o.program||'—'}</div>
+          <div><b>المدير التنفيذي:</b> ${o.ceo||'—'}</div>
+          <div><b>المحاسب:</b> ${o.accountant||'—'}</div>
+          <div><b>ضابط الاتصال:</b> ${o.contact||'—'}</div>
+          <div><b>الهاتف:</b> ${o.phone||'—'}</div>
+          <div><b>البريد:</b> ${o.email||'—'}</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="chd">ملخص الأداء</div>
+        <div class="g2" style="gap:8px;margin-bottom:10px">
+          <div class="sm"><div class="sm-v" style="color:${clr(avg)}">${avg}%</div><div class="sm-l">إجمالي الإنجاز</div></div>
+          <div class="sm"><div class="sm-v" style="color:var(--green)">${doneT}/${totalT}</div><div class="sm-l">مهام مكتملة</div></div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--r);padding:12px">
+          <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:8px">التقييم القبلي والبعدي</div>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--red)">${o.score}%</div><div style="font-size:10px;color:var(--text2)">قبلي</div></div>
+            <div style="font-size:18px;color:var(--text3)">←</div>
+            <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green)">${o.scoreAfter}%</div><div style="font-size:10px;color:var(--text2)">بعدي</div></div>
+            <div style="font-size:15px;font-weight:800;color:var(--green)">+${o.scoreAfter-o.score} نقطة</div>
+          </div>
+          ${o.scoreNote?`<div style="font-size:11px;color:var(--text2);margin-top:8px;border-top:1px solid var(--border);padding-top:8px">${o.scoreNote}</div>`:''}
+        </div>
+      </div>
+    </div>
+    ${phHTML}
+    <div style="text-align:center;font-size:10px;color:var(--text3);padding:12px;border-top:1px solid var(--border);margin-top:8px">
+      أُعدّ هذا التقرير بواسطة فريق كريستون للاستشارات المالية — ${date}
+    </div>`;
+}
+
+function printReport(){
+  // Show only report page before printing
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  el('pg-report').classList.add('on');
+  setTimeout(()=>window.print(),100);
+}
+
+function exportCSV(){
+  const id=+el('fRepOrg').value;
+  const o=getOrg(id); if(!o) return;
+  const d=ORG_TASKS[id]||{};
+  const rows=[['المرحلة','المهمة','المسؤول','الإنجاز%','الحالة','البداية','النهاية','ملاحظات']];
+  MASTER_TASKS.forEach(t=>{
+    const td=d[t.id]||{pct:0};
+    const status=td.pct===100?'مكتمل':td.pct>0?'جاري':'معلق';
+    rows.push([t.phase,t.name,uName(td.assignee)||'',td.pct,status,td.start||'',td.end||'',td.note||'']);
+  });
+  const csv='\uFEFF'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=`تقرير_${o.name.replace(/\s/g,'_')}.csv`;
+  a.click();
+  toast('📥 تم تصدير الملف');
+}
+
+/* ══ TEAM ══ */
+function renderTeam(){
+  el('teamList').innerHTML=Object.entries(USERS).map(([id,u])=>`
+    <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+      <div class="ava ${u.cls||'av-x'}">${u.ava||u.name[0]}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:700">${u.name}</div><div style="font-size:11px;color:var(--text2)">${u.role||'—'}</div></div>
+      <div style="font-size:10px;color:var(--text2);font-weight:600">@${id}</div>
+      <span class="pill ${u.level==='admin'?'p-s':'p-w'}">${u.level==='admin'?'صلاحيات كاملة':'اطلاع فقط'}</span>
+      ${isAdmin()&&id!==CU?`<div style="display:flex;gap:4px"><button class="btn btn-edit btn-sm" onclick="openEditUser('${id}')">✏️</button><button class="btn btn-del btn-sm" onclick="delUser('${id}')">إزالة</button></div>`:''}
+    </div>`).join('');
+}
+function openAddUser(){
+  ['uFullName','uUsername','uJobTitle','uPw'].forEach(id=>{el(id).value='';});
+  el('uLvl').value='admin';
+  el('userModal').classList.add('open');
+}
+function saveUser(){
+  const username=el('uUsername').value.trim(), name=el('uFullName').value.trim();
+  if(!username||!name){alert('الاسم واسم المستخدم مطلوبان'); return;}
+  if(USERS[username]){alert('اسم المستخدم موجود بالفعل'); return;}
+  const pw=el('uPw').value;
+  if(pw.length<6){alert('كلمة المرور 6 أحرف على الأقل'); return;}
+  const cls=['av-b','av-g','av-p','av-t','av-a'][Object.keys(USERS).length%5];
+  USERS[username]={name,role:el('uJobTitle').value||'مستخدم',level:el('uLvl').value,pw,
+    ava:name.split(' ').slice(0,2).map(w=>w[0]).join(''),cls};
+  logAct('إضافة مستخدم',`تمت إضافة ${name} (@${username})`);
+  closeM('userModal');
+  pushData('USERS',usersToRows());
+  renderTeam(); initSelects();
+  toast('✅ تم إضافة المستخدم');
+}
+function openEditUser(id){
+  const u=USERS[id]; if(!u) return;
+  el('editUId').value=id;
+  el('editUName').textContent=u.name+' (@'+id+')';
+  el('editULvl').value=u.level;
+  el('editURole').value=u.role||'';
+  el('editUserModal').classList.add('open');
+}
+function saveEditUser(){
+  const id=el('editUId').value;
+  if(!USERS[id]) return;
+  USERS[id].level=el('editULvl').value;
+  USERS[id].role=el('editURole').value;
+  const lvlLabel=USERS[id].level==='admin'?'صلاحيات كاملة':'اطلاع فقط';
+  logAct('تعديل مستخدم','تم تعديل '+USERS[id].name+' الصلاحية: '+lvlLabel);
+  closeM('editUserModal');
+  pushData('USERS',usersToRows());
+  renderTeam(); initSelects();
+  toast('✅ تم تحديث الصلاحية');
+}
+
+function delUser(id){
+  if(!confirm(`إزالة ${USERS[id]?.name}؟`)) return;
+  const name=USERS[id]?.name||id;
+  delete USERS[id];
+  logAct('حذف مستخدم',`تم حذف ${name} (@${id})`);
+  pushData('USERS',usersToRows());
+  renderTeam(); initSelects();
+  toast('🗑️ تم الحذف');
+}
+
+/* ══ SETTINGS ══ */
+function renderSettings(){
+  el('apiUrlInp').value=API_URL;
+  el('curApiUrl').textContent=API_URL;
+  if(el('pwSel')) el('pwSel').innerHTML=Object.entries(USERS).map(([id,u])=>`<option value="${id}">${u.name} (@${id})</option>`).join('');
+}
+function changePw(){
+  const uid=el('pwSel').value, val=el('pwNew').value.trim(), msg=el('pwMsg');
+  if(val.length<6){msg.style.color='var(--red)';msg.textContent='كلمة المرور 6 أحرف على الأقل'; return;}
+  USERS[uid].pw=val;
+  msg.style.color='var(--green)'; msg.textContent='✅ تم تغيير كلمة المرور';
+  el('pwNew').value='';
+  pushData('USERS',usersToRows());
+  setTimeout(()=>msg.textContent='',3000);
+}
+function saveApiUrl(){
+  const url=el('apiUrlInp').value.trim();
+  if(!url.startsWith('https://')){alert('رابط غير صحيح'); return;}
+  API_URL=url;
+  localStorage.setItem('fp_api',url);
+  el('curApiUrl').textContent=url;
+  toast('✅ تم حفظ الرابط');
+}
+</script>
+</body>
+</html>
