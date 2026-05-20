@@ -654,6 +654,23 @@ let syncing = false;
 let lastSyncTime = null;
 
 /* ── HELPERS ── */
+function restoreTasksFromLocal(){
+  try{
+    const saved = localStorage.getItem('fp_TASKS_obj');
+    if(saved){
+      const parsed = JSON.parse(saved);
+      if(Object.keys(parsed).length>0){
+        ORG_TASKS = parsed;
+        console.log('✅ Restored tasks from localStorage');
+        return true;
+      }
+    }
+  } catch(e){ console.warn('localStorage restore failed:', e); }
+  return false;
+}
+function saveTasksToLocal(){
+  try{ localStorage.setItem('fp_TASKS_obj', JSON.stringify(ORG_TASKS)); } catch(e){}
+}
 const isAdmin = () => CU && USERS[CU] && USERS[CU].level === 'admin';
 const closeM = id => document.getElementById(id).classList.remove('open');
 const getOrg = id => ORGS.find(o => o.id === +id);
@@ -714,16 +731,34 @@ async function syncNow(){
 }
 
 async function pushData(sheet, rows){
-  try{
-    const params = new URLSearchParams({
-      action: 'write',
-      sheet: sheet,
-      rows: encodeURIComponent(JSON.stringify(rows))
-    });
-    const res = await fetch(API_URL + '?' + params.toString());
-    const json = await res.json();
-    if(!json.success) console.warn('Push warn:', sheet, json);
-  } catch(e){ console.warn('Push failed:', sheet, e.message); }
+  // Split into chunks of 50 rows to avoid URL length limits
+  const CHUNK = 50;
+  const header = rows[0];
+  const dataRows = rows.slice(1);
+  
+  if(dataRows.length === 0){
+    // Just write header
+    try{
+      const params = new URLSearchParams({action:'write', sheet, rows: encodeURIComponent(JSON.stringify([header]))});
+      await fetch(API_URL + '?' + params.toString());
+    } catch(e){ console.warn('Push failed:', sheet, e.message); }
+    return;
+  }
+
+  // First chunk: header + first 50 rows (action=write clears sheet)
+  for(let i=0; i<dataRows.length; i+=CHUNK){
+    const chunk = i===0 ? [header, ...dataRows.slice(0,CHUNK)] : dataRows.slice(i, i+CHUNK);
+    const action = i===0 ? 'write' : 'append';
+    try{
+      const params = new URLSearchParams({action, sheet, rows: encodeURIComponent(JSON.stringify(chunk))});
+      const res = await fetch(API_URL + '?' + params.toString());
+      const json = await res.json();
+      if(!json.success) console.warn('Push chunk warn:', sheet, i, json);
+    } catch(e){ console.warn('Push chunk failed:', sheet, i, e.message); }
+  }
+  
+  // Save to localStorage as backup
+  try{ localStorage.setItem('fp_'+sheet, JSON.stringify(rows)); } catch(e){}
 }
 
 async function pushInitialData(){
@@ -754,15 +789,21 @@ function applySheet(data){
       if(!newTasks[oid]) newTasks[oid]={};
       newTasks[oid][tid]={pct:+r[2]||0,note:r[3]||'',start:r[4]||'',end:r[5]||'',assignee:r[6]||''};
     });
-    // Only apply if we got real data (more than just headers)
     if(Object.keys(newTasks).length>0){
       ORG_TASKS=newTasks;
-      // Fill missing tasks for all orgs
       ORGS.forEach(o=>{
         if(!ORG_TASKS[o.id]) ORG_TASKS[o.id]={};
         MASTER_TASKS.forEach(t=>{ if(!ORG_TASKS[o.id][t.id]) ORG_TASKS[o.id][t.id]={pct:0,note:'',start:'',end:'',assignee:''}; });
       });
+      // Save to localStorage backup
+      try{ localStorage.setItem('fp_TASKS_obj', JSON.stringify(ORG_TASKS)); } catch(e){}
+    } else {
+      // Sheet TASKS empty - restore from localStorage backup
+      restoreTasksFromLocal();
     }
+  } else {
+    // No TASKS sheet data - restore from localStorage backup
+    restoreTasksFromLocal();
   }
   if(data['USERS'] && data['USERS'].length>1){
     USERS={};
@@ -1112,6 +1153,7 @@ function saveTask(){
   const org=getOrg(_editOrgId), task=MASTER_TASKS.find(t=>t.id===_editTaskId);
   logAct('تحديث مهمة',`${org?.name||''} — ${task?.name||''}: ${old.pct}% → ${pct}%${assignee?' ('+uName(assignee)+')':''}`);
   closeM('taskModal');
+  saveTasksToLocal(); // Save immediately to localStorage backup
   pushData('TASKS',tasksToRows());
   pushData('ORGS',orgsToRows());
   renderTasks(); renderDash();
