@@ -708,7 +708,9 @@ async function syncNow(){
     toast('⚠️ لم تتم المزامنة — يعمل بالبيانات المحلية');
   }
   recalcPcts();
-  refreshAll();
+  // Re-apply session after sheet data loads (in case users updated from sheet)
+  if(!CU){ tryAutoLogin(); }
+  else { refreshAll(); }
 }
 
 async function pushData(sheet, rows){
@@ -838,10 +840,19 @@ function doLogout(){
 }
 function tryAutoLogin(){
   const sess = localStorage.getItem('fp_session');
-  if(!sess) return;
+  if(!sess) return false;
   try{
     const {u,p} = JSON.parse(sess);
-    if(USERS[u] && USERS[u].pw===p){ applyLogin(u); return true; }
+    // Check current USERS (default or loaded from sheet)
+    if(USERS[u] && USERS[u].pw===p){
+      applyLogin(u);
+      return true;
+    }
+    // Also check default users in case sheet hasn't loaded yet
+    if(DEF_USERS[u] && DEF_USERS[u].pw===p){
+      applyLogin(u);
+      return true;
+    }
   } catch(e){}
   localStorage.removeItem('fp_session');
   return false;
@@ -849,17 +860,9 @@ function tryAutoLogin(){
 el('pIn').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 el('uIn').addEventListener('keydown',e=>{if(e.key==='Enter')el('pIn').focus();});
 
-// Auto-login on page load
+// Auto-login on page load - runs immediately with default users
 window.addEventListener('DOMContentLoaded', ()=>{
-  // Try session restore after data loads
-  const sess = localStorage.getItem('fp_session');
-  if(sess){
-    try{
-      const {u,p} = JSON.parse(sess);
-      if(USERS[u] && USERS[u].pw===p){ applyLogin(u); }
-      else { localStorage.removeItem('fp_session'); }
-    } catch(e){ localStorage.removeItem('fp_session'); }
-  }
+  tryAutoLogin();
 });
 
 /* ── NAV ── */
